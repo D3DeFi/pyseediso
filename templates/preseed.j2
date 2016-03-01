@@ -1,0 +1,6 @@
+### localization
+d-i debian-installer/locale string {{ obj.locale }}
+d-i debian-installer/language string {{ obj.language }}
+d-i debian-installer/country string {{ obj.country }}
+d-i localechooser/supported-locales multiselect {{ obj.locale }}
+d-i keyboard-configuration/xkb-keymap select {{ obj.keymap }}

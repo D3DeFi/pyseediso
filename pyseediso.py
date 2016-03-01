@@ -1,11 +1,17 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import argparse
-
+from defaults import Defaults
+from jinja2 import Environment, PackageLoader
 
 TODO = """
    d-i partman-basicfilesystems/no_swap boolean true if no swap is detected within primary or lvm options
 """
+
+class Config(Defaults):
+
+    def __init__(self, *args, **kwargs):
+        super(Config, self).__init__(*args, **kwargs)
 
 
 if __name__ == '__main__':
@@ -35,3 +41,8 @@ if __name__ == '__main__':
     arg_parser.add_argument(
         '--poweroff', help='shutdown system after installation instead of restarting it', action='store_true')
     args = arg_parser.parse_args()
+
+    env = Environment(loader=PackageLoader('pyseediso', 'templates'))
+    template = env.get_template('preseed.j2')
+    config = Config()
+    print template.render(obj=config)
