@@ -45,4 +45,4 @@ if __name__ == '__main__':
     env = Environment(loader=PackageLoader('pyseediso', 'templates'))
     template = env.get_template('preseed.j2')
     config = Config()
-    print template.render(obj=config)
+    print template.render(config=config)
