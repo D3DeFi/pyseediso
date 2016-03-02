@@ -21,14 +21,13 @@ d-i netcfg/choose_interface select {{ config.default_interface }}
 {% if config.configure_networking == 'true' and config.disable_autoconfig == 'true' %}
 d-i netcfg/get_hostname string {{ config.hostname }}
 d-i netcfg/get_domain string {{ config.domain }}
-#d-i netcfg/get_ipaddress string {{ config.network }} #TODO config.getip
-#d-i netcfg/get_netmask string {{ config.network }} #TODO config.getnetmask
+d-i netcfg/get_ipaddress string {{ config.network[0] }}
+d-i netcfg/get_netmask string {{ config.network[1] }}
 d-i netcfg/get_gateway string {{ config.gateway }}
 d-i netcfg/get_nameservers string {{ config.dns }}
 d-i netcfg/confirm_static boolean true
 d-i netcfg/wireless_wep string
 {% endif %}
-
 ### firmware
 d-i hw-detect/load_firmware boolean {{ config.load_firmware }}
 
@@ -42,7 +41,6 @@ d-i passwd/username string {{ config.user_name }}
 d-i passwd/user-password password {{ config.user_pass }}
 d-i passwd/user-password-again password {{ config.user_pass }}
 {% endif %}
-
 ### time
 d-i clock-setup/utc boolean {{ config.use_utc }}
 d-i clock-setup/ntp boolean {{ config.use_ntp }}
