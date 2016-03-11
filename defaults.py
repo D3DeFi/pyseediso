@@ -54,6 +54,9 @@ class Defaults(object):
         self.remove_previous_lvm = 'true'           # If neccessary installer will remove
         self.remove_previous_md = 'true'            # any previous sw raids or lvms
 
+        # Grub
+        self.grub = '/dev/sda'                      # Where to install GRUB
+
         # Packages
         self.packages = [
             'openssh-server', 'build-essential', 'ssh', 'ca-certificates', 'curl',
@@ -62,6 +65,4 @@ class Defaults(object):
         ]
         self.upgrade_mode = 'full-upgrade'          # Upgrade packages after debootstrap
 
-        # Grub
-        self.grub = '/dev/sda'                      # Where to install GRUB
         self.poweroff = 'false'                     # Poweroff system after install

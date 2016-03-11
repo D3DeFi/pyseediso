@@ -1,38 +1,21 @@
 #!/usr/bin/env python
 
+import sys
+import time
 import argparse
 from defaults import Defaults
 from jinja2 import Environment, PackageLoader
-from netaddr import IPNetwork, AddrFormatError
-import time
-import sys
+from pyseediso import helpers
 
 
 class Config(Defaults):
 
     def __init__(self, *args, **kwargs):
         super(Config, self).__init__(*args, **kwargs)
-        self.network = parse_network_string(self.network)
+        self.network = helpers.parse_network_string(self.network)
 
     def update(self, item, value):
         setattr(self, item, value)
-
-
-def parse_network_string(netstr):
-    try:
-        ip = IPNetwork(netstr)
-        return [ip.ip, ip.netmask]
-    except AddrFormatError:
-        return ['']*2
-
-
-def parse_disksize_string(diskstr):
-    if diskstr.endswith('T'):
-        return int(diskstr.strip('T')) * 1024 * 1024
-    elif diskstr.endswith('G'):
-        return int(diskstr.strip('G')) * 1024
-    elif diskstr.endswith('M'):
-        return int(diskstr.strip('M'))
 
 
 if __name__ == '__main__':
@@ -83,7 +66,7 @@ if __name__ == '__main__':
         attributes.update({
             'configure_networking': 'true',
             'disable_autoconfig': 'true',
-            'network': parse_network_string(args.net),
+            'network': helpers.parse_network_string(args.net),
             'gateway': args.gw
         })
 
@@ -117,4 +100,3 @@ if __name__ == '__main__':
             args.preseed = '/tmp/pyseed-preseed-cfg-{}'.format(time.time())
             with open(args.preseed, 'w') as f:
                 template.stream(config=config).dump(f)
-
