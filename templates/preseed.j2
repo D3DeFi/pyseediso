@@ -18,9 +18,11 @@ d-i keyboard-configuration/xkb-keymap select {{ config.keymap }}
 d-i netcfg/enable boolean {{ config.configure_networking }}
 d-i netcfg/disable_autoconfig boolean {{ config.disable_autoconfig }}
 d-i netcfg/choose_interface select {{ config.default_interface }}
-{% if config.configure_networking == 'true' and config.disable_autoconfig == 'true' %}
 d-i netcfg/get_hostname string {{ config.hostname }}
 d-i netcfg/get_domain string {{ config.domain }}
+{% if config.configure_networking == 'true' and config.disable_autoconfig == 'true' %}
+d-i netcfg/dhcp_failed note
+d-i netcfg/dhcp_options select Configure network manually
 d-i netcfg/get_ipaddress string {{ config.network[0] }}
 d-i netcfg/get_netmask string {{ config.network[1] }}
 d-i netcfg/get_gateway string {{ config.gateway }}
@@ -47,23 +49,25 @@ d-i clock-setup/ntp boolean {{ config.use_ntp }}
 {% if config.use_ntp == 'true' %}d-i clock-setup/ntp-server string {{ config.ntp_server }}{% endif %}
 d-i time/zone string {{ config.timezone }}
 
-### partitioning - TODO
-#d-i partman-auto/method string {{ config.method }} $TODO - overide
-#d-i partman-auto/disk string {{ config.disks }}
-#d-i partman-auto-lvm/new_vg_name string {{ config.vg_name }}
-#d-i partman-auto-lvm/no_boot boolean true # if no boot is specified in primary or lvm opt
-#d-i partman-basicfilesystems/no_swap boolean true # if no swap in primary or lvm options
-#d-i partman-lvm/device_remove_lvm boolean {{ config.remove_previous_lvm }}
-#d-i partman-md/device_remove_md boolean {{ config.remove_previous_md }}
-#d-i partman-partitioning/confirm_write_new_label boolean true
-#d-i partman/choose_partition select finish
-#d-i partman/confirm boolean true
-#d-i partman-lvm/confirm boolean true
-#d-i partman-md/confirm boolean true
-#d-i partman/confirm_nooverwrite boolean true
-#d-i partman-lvm/confirm_nooverwrite boolean true
-#d-i partman-md/confirm_nooverwrite boolean true
-#d-i partman-basicmethods/method_only boolean false
+### partitioning
+d-i partman-auto/method string {{ config.method }}
+d-i partman-auto/disk string {{ config.disks }}
+d-i partman-auto-lvm/new_vg_name string {{ config.vg_name }}
+d-i partman-auto-lvm/no_boot boolean true
+d-i partman-basicfilesystems/no_swap boolean true
+d-i partman-lvm/device_remove_lvm boolean {{ config.remove_previous_lvm }}
+d-i partman-md/device_remove_md boolean {{ config.remove_previous_md }}
+# {{ config.primary }}
+# {{ config.lvm }}
+d-i partman-partitioning/confirm_write_new_label boolean true
+d-i partman/choose_partition select finish
+d-i partman/confirm boolean true
+d-i partman-lvm/confirm boolean true
+d-i partman-md/confirm boolean true
+d-i partman/confirm_nooverwrite boolean true
+d-i partman-lvm/confirm_nooverwrite boolean true
+d-i partman-md/confirm_nooverwrite boolean true
+d-i partman-basicmethods/method_only boolean false
 
 ### apt
 d-i apt-setup/use_mirror boolean {{ config.network_mirror }}

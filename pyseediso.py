@@ -27,7 +27,9 @@ def parse_network_string(netstr):
 
 
 def parse_disksize_string(diskstr):
-    if diskstr.endswith('G'):
+    if diskstr.endswith('T'):
+        return int(diskstr.strip('T')) * 1024 * 1024
+    elif diskstr.endswith('G'):
         return int(diskstr.strip('G')) * 1024
     elif diskstr.endswith('M'):
         return int(diskstr.strip('M'))
@@ -52,7 +54,7 @@ if __name__ == '__main__':
 
     dskopt = parser.add_argument_group('disk arguments')
     dskopt.add_argument('--disks', metavar='<disks>', help="install disks (ex. --disks '/dev/sda /dev/sdb')")
-    dskopt.add_argument('--raid', metavar='<raid-type>', choices=[0, 1, 10], help='software raid (ex. --raid=1)')
+    dskopt.add_argument('--raid', metavar='<raid-type>', choices=['0', '1', '10'], help='software raid (ex. --raid=1)')
     dskopt.add_argument('--primary', metavar='<part>', help="primary partitions (ex. --primary '/boot 500M ext4')")
     dskopt.add_argument('--lvm', metavar='<lvs>', help="logical volumes (ex. --lvm '/ 2G ext4; /var 3G xfs;')")
     dskopt.add_argument('--grub', metavar='<device>', help="GRUB destination (ex. --grub '/dev/sda /dev/sdb')")
@@ -61,6 +63,11 @@ if __name__ == '__main__':
     if bool(args.net) ^ bool(args.gw):
         parser.error('--net and --gw options must be used together')
         sys.exit(1)
+
+    if args.raid:
+        if not (args.primary or args.lvm):
+            parser.error('either --primary, --lvm or both need to be used with --raid option')
+            sys.exit(1)
 
     config = Config()
     attributes = {
@@ -83,6 +90,17 @@ if __name__ == '__main__':
     for key, value in attributes.iteritems():
         if value:
             config.update(key, value)
+
+    if args.raid or args.primary or args.lvm:
+        if args.raid:
+            config.update('method', 'raid')
+            config.update('raid_type', args.raid)
+        elif args.lvm:
+            config.update('method', 'lvm')
+        elif args.primary:
+            config.update('method', 'regular')
+        config.update('primary', args.primary)
+        config.update('lvm', args.lvm)
 
     if not args.preseed:
         env = Environment(loader=PackageLoader('pyseediso', 'templates'))
