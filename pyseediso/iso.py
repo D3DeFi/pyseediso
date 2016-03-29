@@ -27,9 +27,7 @@ def get_iso_label(iso):
     if is_executable('blkid'):
         try:
             p1 = subprocess.Popen(['blkid', '-o', 'value', iso], stdout=subprocess.PIPE)
-            p2 = subprocess.Popen(['head', '-1'], stdin=p1.stdout, stdout=subprocess.PIPE)
-            p1.stdout.close()
-            label = p2.communicate()[0]
+            label = p1.communicate()[0].split('\n')[0]
         except OSError as e:
             raise GeneratorException(e.message)
         return label
